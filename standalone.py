@@ -76,6 +76,7 @@ class PathPermissions(object):
         self.default_allow = default_allow
 
     def allow(self, path):
+        return True
         # First match wins
         for pattern, allow in self._entries:
             if pattern.match(path):
@@ -217,10 +218,11 @@ class BratHTTPRequestHandler(SimpleHTTPRequestHandler):
 
         return self.permissions.allow(path)
 
-    def list_directory(self, path):
-        """Override SimpleHTTPRequestHandler.list_directory()"""
-        # TODO: permissions for directory listings
-        self.send_error(403)
+    # def list_directory(self, path):
+    #     import ipdb; ipdb.set_trace()
+    #     """Override SimpleHTTPRequestHandler.list_directory()"""
+    #     # TODO: permissions for directory listings
+    #     self.send_error(403)
 
     def do_POST(self):
         """Serve a POST request.
