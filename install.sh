@@ -25,28 +25,40 @@ USAGE="Usage: ${SCRIPT_NAME} [-u] [-q]"
 
 # Options
 UNPRIVILEGED=false
-QUICK=false
+# QUICK={$QUICKfalse
+# USERNAME="${USERNAME}"
+# PASSWORD="${PASSWORD}"
 
-while getopts uq OPT; do
-    case "${OPT}" in
-        u)
-            UNPRIVILEGED=true
-            ;;
-	q)
-            QUICK=true
-            UNPRIVILEGED=true
-	    ;;
-        \?)
-            echo ${USAGE} 1>&2
-            exit 1
-            ;;
-    esac
-done
-shift `expr $OPTIND - 1`
+# while getopts uq OPT; do
+#     case "${OPT}" in
+#         u)
+#             UNPRIVILEGED=true
+#             ;;
+# 	q)
+#             QUICK=true
+#             UNPRIVILEGED=true
+# 	    ;;
+#         \?)
+#             echo ${USAGE} 1>&2
+#             exit 1
+#             ;;
+#     esac
+# done
+# shift `expr $OPTIND - 1
 
 if [ "$QUICK" = true ]; then
-    user_name='default'
-    password=`python -c 'import string; import random; print "".join(random.choice(string.ascii_letters+string.digits) for _ in range(10))'`
+    # echo "The variables ${USERNAME}, ${PASSWORD}, ${QUICK}"
+    if [ "$USERNAME" = false ]; then
+        user_name='default'
+    else
+        user_name="$USERNAME"
+    fi
+    if [ "$PASSWORD" = false ]; then
+        password=`python -c 'import string; import random; print "".join(random.choice(string.ascii_letters+string.digits) for _ in range(10))'`
+    else
+        password="$PASSWORD"
+    fi
+    #Comment this out if password is set externally?
     echo "Quick install: set user name to \"$user_name\" and password to \"$password\""
     admin_email='unconfigured@example.com'
 else
@@ -91,8 +103,11 @@ else
     mkdir -p $data_dir_abs
 
     # Try to determine Apache user and group
-
-    apache_user=`ps aux | grep -v 'tomcat' | grep '[a]pache\|[h]ttpd' | cut -d ' ' -f 1 | grep -v '^root$' | head -n 1`
+    if [ -n $APACHE_USER ] ; then
+        apache_user=$APACHE_USER
+    else
+        apache_user=`ps aux | grep -v 'tomcat' | grep '[a]pache\|[h]ttpd' | cut -d ' ' -f 1 | grep -v '^root$' | head -n 1`    
+    fi
     apache_group=`groups $apache_user | head -n 1 | sed 's/ .*//'`
 
     # Place example data
