@@ -9,7 +9,7 @@ Version:    2011-04-21
 """
 
 from inspect import getargspec
-from logging import info as log_info
+from logging import info as log_info, error as log_error
 from os.path import join as path_join
 from os.path import abspath, normpath
 
@@ -305,6 +305,9 @@ def dispatch(http_args, client_ip, client_hostname):
 
     # Log annotation actions separately (if so configured)
     if action in LOGGED_ANNOTATOR_ACTION:
+        if action == "createSpan":
+            Messager.error("LOG ERROR - {}".format(
+                    [http_args['collection'], http_args['document'], 'START', action, action_args]))
         log_annotation(http_args['collection'],
                        http_args['document'],
                        'START', action, action_args)
