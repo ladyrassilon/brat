@@ -117,3 +117,11 @@ except NameError:
 # ]
 
 SEGMENT_API_KEY = "MY_SEGMENT_KEY"
+
+AWS_CREDENTIALS = {
+    "aws_access_key_id": "AKEY",
+    "aws_secret_access_key": "ASECRET",
+    "region_name": "eu-fake-region",
+}
+
+AWS_SNS_QUEUE = "https://sqs.eu-fake-region.amazonaws.com/FAKEINSTANCE/FAKEQUEUE"
