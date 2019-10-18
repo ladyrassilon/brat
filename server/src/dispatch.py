@@ -17,14 +17,13 @@ from config import DATA_DIR
 
 from .annlog import log_annotation
 from .annotator import (create_arc, create_span, create_span_batch, delete_arc, delete_span,
-                       delete_span_batch, reverse_arc, split_span)
+                        delete_span_batch, reverse_arc, split_span, mark_document_done)
 from .auth import NotAuthorisedError, login, logout, whoami
 from .common import ProtocolError
 from .convert.convert import convert
 from .delete import delete_collection, delete_document
 from .docimport import save_import
-from .document import (get_configuration, get_directory_information,
-                      get_document, get_document_timestamp)
+from .document import (get_configuration, get_directory_information, get_document, get_document_timestamp)
 from .download import download_collection, download_file
 from .jsonwrap import dumps
 from .message import Messager
@@ -56,6 +55,7 @@ DISPATCHER = {
     'getDocument': get_document,
     'getDocumentTimestamp': get_document_timestamp,
     'importDocument': save_import,
+    'markDocumentDone': mark_document_done,
 
     'storeSVG': store_svg,
     'retrieveStored': retrieve_stored,
@@ -121,6 +121,7 @@ ANNOTATION_ACTION = set((
     'splitSpan',
     'suggestSpanTypes',
     'undo',
+    'markDocumentDone',
 ))
 
 # Actions that will be logged as annotator actions (if so configured)
@@ -306,6 +307,7 @@ def dispatch(http_args, client_ip, client_hostname):
         default_val_by_arg[arg] = default_val
 
     action_args = []
+
     for arg_name in args:
         arg_val = http_args[arg_name]
 

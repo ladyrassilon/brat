@@ -31,6 +31,8 @@ from .message import Messager
 from .projectconfig import (ENTITY_CATEGORY, EVENT_CATEGORY, RELATION_CATEGORY,
                            UNKNOWN_CATEGORY, ProjectConfiguration)
 
+from messaging import Queue
+
 try:
     from config import DEBUG
 except ImportError:
@@ -1317,6 +1319,15 @@ def set_status(directory, document, status=None):
     json_dic = {
         'status': new_status
     }
+    return json_dic
+
+
+def mark_document_done(collection, document, user):
+    json_dic = Queue.send_document_done_notification(
+        collection=collection,
+        document=document,
+        user=user,
+    )
     return json_dic
 
 
