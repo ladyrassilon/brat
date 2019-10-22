@@ -125,3 +125,5 @@ AWS_CREDENTIALS = {
 }
 
 AWS_SNS_QUEUE = "https://sqs.eu-fake-region.amazonaws.com/FAKEINSTANCE/FAKEQUEUE"
+
+SEGMENT_API_KEY = "MY_SEGMENT_KEY"
