@@ -15,8 +15,8 @@ from time import time
 
 from filelock import FileLock
 
-from common import ProtocolError
-from message import Messager
+from .common import ProtocolError
+from .message import Messager
 
 '''
 Functionality related to the annotation file format.

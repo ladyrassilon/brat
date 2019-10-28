@@ -10,9 +10,9 @@ from os.path import join as path_join
 from shutil import rmtree
 from tempfile import mkdtemp
 
-from annotation import Annotations, open_textfile
-from common import ProtocolError
-from document import _document_json_dict
+from ..annotation import Annotations, open_textfile
+from ..common import ProtocolError
+from ..document import _document_json_dict
 
 from .stanford import basic_dep as stanford_basic_dep
 from .stanford import collapsed_ccproc_dep as stanford_collapsed_ccproc_dep

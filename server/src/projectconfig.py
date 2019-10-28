@@ -17,8 +17,8 @@ import sys
 import urllib.parse  # TODO reduce scope
 import urllib.robotparser  # TODO reduce scope
 
-from annotation import open_textfile
-from message import Messager
+from .annotation import open_textfile
+from .message import Messager
 
 ENTITY_CATEGORY, EVENT_CATEGORY, RELATION_CATEGORY, UNKNOWN_CATEGORY = range(
     4)

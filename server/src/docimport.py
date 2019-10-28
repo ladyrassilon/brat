@@ -14,9 +14,9 @@ from os.path import isdir, isfile
 
 from config import DATA_DIR
 
-from annotation import JOINED_ANN_FILE_SUFF, TEXT_FILE_SUFFIX, open_textfile
-from common import ProtocolError
-from document import real_directory
+from .annotation import JOINED_ANN_FILE_SUFF, TEXT_FILE_SUFFIX, open_textfile
+from .common import ProtocolError
+from .document import real_directory
 
 # Constants
 DEFAULT_IMPORT_DIR = 'import'

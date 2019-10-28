@@ -15,16 +15,16 @@ from os.path import dirname, isdir
 
 from config import DATA_DIR, USER_PASSWORD
 
-from common import ProtocolError
-from message import Messager
-from projectconfig import ProjectConfiguration
-from session import get_session, invalidate_session
+from .common import ProtocolError
+from .message import Messager
+from .projectconfig import ProjectConfiguration
+from .session import get_session, invalidate_session
 
 try:
     from os.path import relpath
 except ImportError:
     # relpath new to python 2.6; use our implementation if not found
-    from common import relpath
+    from .common import relpath
 
 
 # To raise if the authority to carry out an operation is lacking

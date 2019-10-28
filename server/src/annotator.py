@@ -14,7 +14,7 @@ from os.path import join as path_join
 from os.path import split as path_split
 from re import compile as re_compile
 
-from annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
+from .annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
                         AnnotationsIsReadOnlyError, AttributeAnnotation,
                         BinaryRelationAnnotation,
                         DependingAnnotationDeleteError, EquivAnnotation,
@@ -22,12 +22,12 @@ from annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
                         OnelineCommentAnnotation, SpanOffsetOverlapError,
                         TextAnnotations, TextBoundAnnotation,
                         TextBoundAnnotationWithText, open_textfile)
-from common import ProtocolArgumentError, ProtocolError
-from document import real_directory
-from jsonwrap import dumps as json_dumps
-from jsonwrap import loads as json_loads
-from message import Messager
-from projectconfig import (ENTITY_CATEGORY, EVENT_CATEGORY, RELATION_CATEGORY,
+from .common import ProtocolArgumentError, ProtocolError
+from .document import real_directory
+from .jsonwrap import dumps as json_dumps
+from .jsonwrap import loads as json_loads
+from .message import Messager
+from .projectconfig import (ENTITY_CATEGORY, EVENT_CATEGORY, RELATION_CATEGORY,
                            UNKNOWN_CATEGORY, ProjectConfiguration)
 
 try:
