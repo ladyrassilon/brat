@@ -34,7 +34,9 @@ def ajax_cgi():
     cookie_hdrs, response_data = serve(params, remote_addr, remote_host,
                                        cookie_data)
 
+
     return jsonify(response_data[1])
+
     # Package and send response
     if cookie_hdrs is not None:
         response_hdrs = [hdr for hdr in cookie_hdrs]

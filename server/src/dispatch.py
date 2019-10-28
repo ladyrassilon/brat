@@ -18,6 +18,7 @@ from config import DATA_DIR
 from .annlog import log_annotation
 from .annotator import (create_arc, create_span, create_span_batch, delete_arc, delete_span,
                         delete_span_batch, reverse_arc, split_span, mark_document_done)
+
 from .auth import NotAuthorisedError, login, logout, whoami
 from .common import ProtocolError
 from .convert.convert import convert
@@ -31,7 +32,8 @@ from .norm import norm_get_data, norm_get_name, norm_search
 from .predict import suggest_span_types
 from .search import (search_entity, search_event, search_note, search_relation,
                     search_text)
-from .session import load_conf, save_conf
+from .session import get_session, load_conf, save_conf
+
 from .svg import retrieve_stored, store_svg
 from .tag import tag
 from .undo import undo
