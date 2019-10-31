@@ -1,7 +1,8 @@
 from io import StringIO
 
-from .server.src.server import serve
 from flask import Flask, request, jsonify
+
+from brat_service.brat.server.src.server import serve
 
 app = Flask(__name__)
 
