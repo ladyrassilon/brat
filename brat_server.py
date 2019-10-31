@@ -1,22 +1,9 @@
 from io import StringIO
-from cgi import FieldStorage
 
-from server.src.server import serve
-from flask import Flask, render_template, send_from_directory, request, jsonify
+from .server.src.server import serve
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
-
-@app.route('/static/<path:path>')
-def send_static(path):
-    return send_from_directory('static', path)
-
-@app.route('/client/<path:path>')
-def send_client(path):
-    return send_from_directory('client', path)
-
-@app.route("/")
-def index():
-    return render_template("index.xhtml")
 
 @app.route("/ajax.cgi", methods=("GET", "POST"))
 def ajax_cgi():
@@ -57,8 +44,6 @@ def ajax_cgi():
     final_output = output.getvalue()
     output.close()
     return final_output
-    # output.close()
-    # time.sleep(50)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
