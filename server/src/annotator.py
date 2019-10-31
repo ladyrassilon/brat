@@ -150,7 +150,7 @@ def _json_from_ann(ann_obj):
     # request.
     j_dic = {}
     txt_file_path = ann_obj.get_document() + '.' + TEXT_FILE_SUFFIX
-    from document import (_enrich_json_with_data, _enrich_json_with_base,
+    from .document import (_enrich_json_with_data, _enrich_json_with_base,
                           _enrich_json_with_text)
     _enrich_json_with_base(j_dic)
     # avoid reading text file if the given ann_obj already holds it
