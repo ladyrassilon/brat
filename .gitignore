@@ -12,4 +12,3 @@ logfiles/
 auditing/
 logfiles/
 .DS_Store
-*.tar.gz
