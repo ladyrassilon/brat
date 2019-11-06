@@ -607,13 +607,12 @@ def __read_first_in_directory_tree(directory, filename):
     # config will not be available command-line invocations;
     # in these cases search whole tree
     try:
-        from ...config import BASE_DIR
+        from config import BASE_DIR
     except BaseException:
         BASE_DIR = "/"
     from os.path import split, join
 
     source, result = None, None
-
     # check from the given directory and parents, but not above BASE_DIR
     if directory is not None:
         # TODO: this check may fail; consider "foo//bar/data"
