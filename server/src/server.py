@@ -13,7 +13,7 @@ NOTE(S):
 Author:     Pontus Stenetorp   <pontus is s u-tokyo ac jp>
 Version:    2011-09-29
 """
-
+from cgi import FieldStorage
 from os.path import join as path_join
 from os.path import abspath
 from sys import stderr, version_info
@@ -193,7 +193,11 @@ def _safe_serve(params, client_ip, client_hostname, cookie_data):
             # Also take the opportunity to convert Strings into Unicode,
             #   according to HTTP they should be UTF-8
             try:
-                http_args[k] = params.get(k)
+                # import ipdb; ipdb.set_trace()
+                if type(params) == FieldStorage:
+                    http_args[k] = params.getvalue(k)
+                else:
+                    http_args[k] = params.get(k)
             except TypeError as e:
                 # Messager.error(e)
                 Messager.error(
