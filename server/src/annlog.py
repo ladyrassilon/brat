@@ -13,7 +13,7 @@ import logging
 from os.path import join as path_join
 from os.path import isabs
 
-from brat_service.brat.config import DATA_DIR
+from ...config import DATA_DIR
 
 from .message import Messager
 from .projectconfig import options_get_annlogfile
