@@ -31,7 +31,7 @@ from .message import Messager
 from .projectconfig import (ENTITY_CATEGORY, EVENT_CATEGORY, RELATION_CATEGORY,
                            UNKNOWN_CATEGORY, ProjectConfiguration)
 
-from messaging import Queue
+from .messaging import Queue
 
 try:
     from config import DEBUG
@@ -462,7 +462,6 @@ def create_span_batch(collection, document, offsets, type, attributes=None,
     return _create_span(collection, document, offsets, type, attributes,
                         normalizations, id, comment)
 
-
 def create_span(collection, document, offsets, type, attributes=None,
                 normalizations=None, id=None, comment=None):
     # offsets should be JSON string corresponding to a list of (start,
@@ -643,7 +642,11 @@ def _create_span(collection, document, offsets, _type, attributes=None,
 
     if _offset_overlaps(offsets):
         raise SpanOffsetOverlapError(offsets)
+    document_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.txt")
+    with open(document_path) as document_file:
+        document_data = document_file.read()
 
+    import ipdb; ipdb.set_trace()
     directory = collection
     undo_resp = {}
 
