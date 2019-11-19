@@ -32,12 +32,14 @@ from .norm import norm_get_data, norm_get_name, norm_search
 from .predict import suggest_span_types
 from .search import (search_entity, search_event, search_note, search_relation,
                     search_text)
-from .session import get_session, load_conf, save_conf
+from .session import load_conf, save_conf
 from .svg import retrieve_stored, store_svg
 from .tag import tag
 from .undo import undo
 from .auditing import AuditLog
 import multiprocessing as mp
+
+from flask import session
 
 # no-op function that can be invoked by client to log a user action
 
@@ -270,7 +272,8 @@ def dispatch(http_args, client_ip, client_hostname):
     # Make sure that we are authenticated if we are to do certain actions
     if action in REQUIRES_AUTHENTICATION:
         try:
-            user = get_session()['user']
+            user = session['user']
+            # user = get_session()['user']
             http_args['user'] = user
         except KeyError:
             user = None

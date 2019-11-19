@@ -4,7 +4,14 @@ from flask import Flask, request, jsonify
 
 from server.src.server import serve
 
+import config as brat_config
+
 app = Flask(__name__)
+
+try:
+    app.secret_key = brat_config.SECRET_KEY
+except AttributeError:
+    app.secret_key=b"THIS IS AN UTTERLY INSECURE KEY"
 
 @app.route("/ajax.cgi", methods=("GET", "POST"))
 def ajax_cgi():
@@ -46,5 +53,10 @@ def ajax_cgi():
     output.close()
     return final_output
 
+try:
+    debug = brat_config.FLASK_DEBUG
+except AttributeError:
+    debug = True
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=debug)
