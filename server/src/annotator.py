@@ -10,6 +10,7 @@ Version:    2011-04-22
 
 # XXX: This module is messy, re-factor to be done
 import re
+from collections import defaultdict
 from os.path import join as path_join
 from os.path import split as path_split
 from re import compile as re_compile
@@ -1077,7 +1078,42 @@ def delete_arc(collection, document, origin, target, type):
 # TODO: ONLY determine what action to take! Delegate to Annotations!
 
 
+def delete_span_batch(collection, document, id):
+    annotations_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.ann")
+    with open(annotations_path) as annotations_file:
+        annotations_lines = annotations_file.readlines()
+
+    # annotations_id_map = {}
+    document_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.txt")
+    with open(document_path) as document_file:
+        document_data = document_file.read()
+
+    id_to_text_and_category = {}
+    text_and_category_to_id = defaultdict(list)
+    for line in annotations_lines:
+        annotation_id, content, _ = line.split("\t")
+        annotation_category, start_raw, end_raw = content.split()
+        start = int(start_raw)
+        end = int(end_raw)
+
+        annotation_text = document_data[start:end]
+        id_to_text_and_category[annotation_id] = {
+            "text": annotation_text,
+            "category": annotation_category,
+        }
+        text_and_category_to_id[(annotation_text, annotation_category)].append(annotation_id)
+
+    source_item = id_to_text_and_category[id]
+    source_text = source_item["text"]
+    source_category = source_item["category"]
+
+    matching_ids = text_and_category_to_id[(source_text, source_category)]
+    for matching_id in matching_ids:
+        mods_json = delete_span(collection, document, matching_id)
+    return mods_json
+
 def delete_span(collection, document, id):
+
     directory = collection
 
     real_dir = real_directory(directory)

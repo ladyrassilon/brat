@@ -2439,6 +2439,21 @@ var AnnotatorUI = (function($, window, undefined) {
         $('#waiter').dialog('open');
       };
 
+      var deleteSpanBatch = function() {
+        if (Configuration.confirmModeOn && !confirm("Are you sure you want to delete these annotations?")) {
+          return;
+        }
+        $.extend(spanOptions, {
+          action: 'deleteSpanBatch',
+          collection: coll,
+          'document': doc,
+        });
+        spanOptions.offsets = JSON.stringify(spanOptions.offsets);
+        dispatcher.post('ajax', [spanOptions, 'edited']);
+        dispatcher.post('hideForm');
+        $('#waiter').dialog('open');
+      };
+
       var reselectSpan = function() {
         dispatcher.post('hideForm');
         svgElement.addClass('reselect');
@@ -2570,6 +2585,10 @@ var AnnotatorUI = (function($, window, undefined) {
               text: "Delete",
               click: deleteSpan
             }, {
+              id: 'span_form_delete_batch',
+              text: "Delete Batch",
+              click: deleteSpanBatch
+            },{
               id: 'span_form_delete_fragment',
               text: "Delete Frag.",
               click: deleteFragment
