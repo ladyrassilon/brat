@@ -795,13 +795,13 @@ var AnnotatorUI = (function($, window, undefined) {
         }
         $('#span_highlight_link').attr('href', linkHash);
         if (span && !reselectedSpan) {
-          $('#span_form_reselect, #span_form_delete, #span_form_add_fragment').show();
+          $('#span_form_reselect, #span_form_delete, #span_form_delete_batch, #span_form_add_fragment').show();
           keymap[$.ui.keyCode.DELETE] = 'span_form_delete';
           keymap[$.ui.keyCode.INSERT] = 'span_form_reselect';
           keymap['S-' + $.ui.keyCode.ENTER] = 'span_form_add_fragment';
           $('#span_notes').val(span.annotatorNotes || '');
         } else {
-          $('#span_form_reselect, #span_form_delete, #span_form_add_fragment').hide();
+          $('#span_form_reselect, #span_form_delete, #span_form_delete_batch, #span_form_add_fragment').hide();
           keymap[$.ui.keyCode.DELETE] = null;
           keymap[$.ui.keyCode.INSERT] = null;
           keymap['S-' + $.ui.keyCode.ENTER] = null;
