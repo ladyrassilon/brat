@@ -1085,7 +1085,7 @@ def delete_span_batch(collection, document, id):
 
     # annotations_id_map = {}
     document_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.txt")
-    with open(document_path) as document_file:
+    with open(document_path, encoding="utf-8") as document_file:
         document_data = document_file.read()
 
     id_to_text_and_category = {}
