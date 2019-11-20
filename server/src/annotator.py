@@ -447,7 +447,7 @@ def create_span_batch(collection, document, offsets, type, attributes=None,
     offsets = _json_offsets_to_list(offsets)
 
     document_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.txt")
-    with open(document_path) as document_file:
+    with open(document_path, encoding='utf-8') as document_file:
         document_data = document_file.read()
 
     initial_span = document_data[offsets[0][0]:offsets[0][1]]
