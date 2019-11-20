@@ -16,8 +16,9 @@ from os.path import abspath, normpath
 from config import DATA_DIR
 
 from .annlog import log_annotation
-from .annotator import (create_arc, create_span, create_span_batch, delete_arc, delete_span,
-                        delete_span_batch, reverse_arc, split_span, mark_document_done)
+
+from .annotator import (create_arc, create_span, create_span_batch, delete_arc, delete_span, mark_document_done,
+                        delete_span_batch, reverse_arc, split_span)
 
 from .auth import NotAuthorisedError, login, logout, whoami
 from .common import ProtocolError
