@@ -16,7 +16,7 @@ from os.path import abspath, normpath
 from config import DATA_DIR
 
 from annlog import log_annotation
-from annotator import (create_arc, create_span, delete_arc, delete_span,
+from annotator import (create_arc, create_span, create_span_batch, delete_arc, delete_span,
                        reverse_arc, split_span)
 from auth import NotAuthorisedError, login, logout, whoami
 from common import ProtocolError
@@ -36,6 +36,8 @@ from session import get_session, load_conf, save_conf
 from svg import retrieve_stored, store_svg
 from tag import tag
 from undo import undo
+from auditing import AuditLog
+import multiprocessing as mp
 
 # no-op function that can be invoked by client to log a user action
 
@@ -63,6 +65,7 @@ DISPATCHER = {
     'whoami': whoami,
 
     'createSpan': create_span,
+    'createSpanBatch': create_span_batch,
     'deleteSpan': delete_span,
     'splitSpan': split_span,
 
@@ -136,6 +139,16 @@ REQUIRES_AUTHENTICATION = ANNOTATION_ACTION | set((
     'searchNoteInCollection',
 
     'tag',
+))
+
+AUDIT_ANNOTATOR_ACTION = ANNOTATION_ACTION | set((
+    'login',
+    'createSpan',
+    'deleteSpan',
+    'splitSpan',
+    'createArc',
+    'reverseArc',
+    'deleteArc',
 ))
 
 # Sanity check
@@ -258,6 +271,7 @@ def dispatch(http_args, client_ip, client_hostname):
     if action in REQUIRES_AUTHENTICATION:
         try:
             user = get_session()['user']
+            http_args['user'] = user
         except KeyError:
             user = None
         if user is None:
@@ -318,6 +332,22 @@ def dispatch(http_args, client_ip, client_hostname):
         log_annotation(http_args['collection'],
                        http_args['document'],
                        'FINISH', action, action_args)
+
+    if action in AUDIT_ANNOTATOR_ACTION:
+        label_type_id = None
+        if 'edited' in json_dic and json_dic['edited']:
+            label_type_id = json_dic['edited'][0][0]
+        log_process_kwargs = {
+            "user": http_args['user'],
+            "action": action,
+            "collection": http_args['collection'],
+            "document": http_args['document'],
+            "label_type_id": label_type_id,
+        }
+        # ctx = mp.get_context('fork')
+        # log_process = ctx.Process(target=AuditLog.log_event, kwargs=log_process_kwargs, daemon=True)
+        # log_process.start()
+        AuditLog.log_event(**log_process_kwargs)
 
     # Assign which action that was performed to the json_dic
     json_dic['action'] = action

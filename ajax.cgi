@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/home/ec2-user/.pyenv/shims/python
 # -*- Mode: Python; tab-width: 4; indent-tabs-mode: nil; -*-
 # vim:set ft=python ts=4 sw=4 sts=4 autoindent:
 
@@ -7,6 +7,9 @@ then delegates the work to the CGI-agnostic brat server.
 
 Author:     Pontus Stenetorp    <pontus is s u-tokyo ac jp>
 Version:    2011-02-07
+
+!/usr/bin/env python
+
 """
 
 # Standard library imports
@@ -15,7 +18,7 @@ from os import environ
 from os.path import dirname
 from os.path import join as path_join
 from sys import path as sys_path, stdout
-
+import time
 # Local imports
 sys_path.append(path_join(dirname(__file__), 'server/src'))
 
@@ -56,6 +59,8 @@ def main(args):
     stdout.write('\n')
     stdout.write('\n')
     stdout.write(response_data[1])
+    stdout.close()
+    # time.sleep(50)
     return 0
 
 
