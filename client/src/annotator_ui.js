@@ -2641,6 +2641,7 @@ var AnnotatorUI = (function($, window, undefined) {
       // set button tooltips (@amadanmath: can this be done in init?)
       $('#span_form_reselect').attr('title', 'Re-select the text span that this annotation marks.');
       $('#span_form_delete').attr('title', 'Delete this annotation.');
+      $('#span_form_delete_batch').attr('title', 'Delete all matching annotations');
       $('#span_form_split').attr('title', 'Split this annotation into multiple similar annotations, distributing its arguments.');
 
       var setTypeLock = function(val) {
