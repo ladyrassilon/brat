@@ -1,4 +1,4 @@
-from simstring.database.base import BaseDatabase
+from .simstring.database.base import BaseDatabase
 import sqlite3
 
 _CREATE_STRINGS_SQL = u"""

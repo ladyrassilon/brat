@@ -8,7 +8,7 @@ config.py
 # Standard locations of data and server temporary files
 data/
 work/
+logfiles/
 auditing/
 logfiles/
 .DS_Store
-*.tar.gz

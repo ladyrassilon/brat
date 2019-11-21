@@ -1,5 +1,6 @@
 import json
-
+from config import BASE_DIR
+from os.path import join as path_join
 from analytics import Client
 import config
 from datetime import datetime
@@ -19,7 +20,8 @@ class _AuditLog:
             'document': document,
             'label_type_id': label_type_id,
         }
-        with open(f"auditing/{user}.txt", "a+") as output_file:
+        output_file_path = path_join(BASE_DIR, "auditing", f"{user}.txt")
+        with open(output_file_path, "a+") as output_file:
             output_entry = {
                 "user": user,
                 "event": action,

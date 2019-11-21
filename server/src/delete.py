@@ -6,7 +6,7 @@
 
 
 
-from message import Messager
+from .message import Messager
 
 
 def delete_document(collection, document):

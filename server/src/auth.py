@@ -13,18 +13,20 @@ from hashlib import sha512
 from os.path import join as path_join
 from os.path import dirname, isdir
 
+from flask import session
+
 from config import DATA_DIR, USER_PASSWORD
 
-from common import ProtocolError
-from message import Messager
-from projectconfig import ProjectConfiguration
-from session import get_session, invalidate_session
+from .common import ProtocolError
+from .message import Messager
+from .projectconfig import ProjectConfiguration
+# from .session import get_session, invalidate_session
 
 try:
     from os.path import relpath
 except ImportError:
     # relpath new to python 2.6; use our implementation if not found
-    from common import relpath
+    from .common import relpath
 
 
 # To raise if the authority to carry out an operation is lacking
@@ -82,14 +84,15 @@ def login(user, password):
     if not _is_authenticated(user, password):
         raise InvalidAuthError
 
-    get_session()['user'] = user
-    Messager.info('Hello!')
+    session.clear()
+    session['user'] = user
+    Messager.info(f"Hello! {user}")
     return {}
 
 
 def logout():
     try:
-        del get_session()['user']
+        del session["user"]
     except KeyError:
         # Already deleted, let it slide
         pass
@@ -101,7 +104,7 @@ def logout():
 def whoami():
     json_dic = {}
     try:
-        json_dic['user'] = get_session().get('user')
+        json_dic['user'] = session['user']
     except KeyError:
         # TODO: Really send this message?
         Messager.error('Not logged in!', duration=3)
@@ -120,7 +123,7 @@ def allowed_to_read(real_path):
         return True  # default allow
 
     try:
-        user = get_session().get('user')
+        user = session['user']
     except KeyError:
         user = None
 

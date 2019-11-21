@@ -7,13 +7,13 @@
 from datetime import datetime
 from functools import reduce
 
-import normdb
-import sdistance
-import simstringdb
-from document import real_directory
-from message import Messager
-from normdb import string_norm_form
-from projectconfig import ProjectConfiguration
+from . import normdb
+from . import sdistance
+from .import simstringdb
+from .document import real_directory
+from .message import Messager
+from .normdb import string_norm_form
+from .projectconfig import ProjectConfiguration
 
 # whether to display alignment scores in search result table
 DISPLAY_SEARCH_SCORES = False

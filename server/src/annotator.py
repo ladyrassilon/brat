@@ -14,7 +14,7 @@ from os.path import join as path_join
 from os.path import split as path_split
 from re import compile as re_compile
 
-from annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
+from .annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
                         AnnotationsIsReadOnlyError, AttributeAnnotation,
                         BinaryRelationAnnotation,
                         DependingAnnotationDeleteError, EquivAnnotation,
@@ -22,12 +22,12 @@ from annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
                         OnelineCommentAnnotation, SpanOffsetOverlapError,
                         TextAnnotations, TextBoundAnnotation,
                         TextBoundAnnotationWithText, open_textfile)
-from common import ProtocolArgumentError, ProtocolError
-from document import real_directory
-from jsonwrap import dumps as json_dumps
-from jsonwrap import loads as json_loads
-from message import Messager
-from projectconfig import (ENTITY_CATEGORY, EVENT_CATEGORY, RELATION_CATEGORY,
+from .common import ProtocolArgumentError, ProtocolError
+from .document import real_directory
+from .jsonwrap import dumps as json_dumps
+from .jsonwrap import loads as json_loads
+from .message import Messager
+from .projectconfig import (ENTITY_CATEGORY, EVENT_CATEGORY, RELATION_CATEGORY,
                            UNKNOWN_CATEGORY, ProjectConfiguration)
 
 try:
@@ -150,7 +150,7 @@ def _json_from_ann(ann_obj):
     # request.
     j_dic = {}
     txt_file_path = ann_obj.get_document() + '.' + TEXT_FILE_SUFFIX
-    from document import (_enrich_json_with_data, _enrich_json_with_base,
+    from .document import (_enrich_json_with_data, _enrich_json_with_base,
                           _enrich_json_with_text)
     _enrich_json_with_base(j_dic)
     # avoid reading text file if the given ann_obj already holds it

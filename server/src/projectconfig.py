@@ -17,8 +17,8 @@ import sys
 import urllib.parse  # TODO reduce scope
 import urllib.robotparser  # TODO reduce scope
 
-from annotation import open_textfile
-from message import Messager
+from .annotation import open_textfile
+from .message import Messager
 
 ENTITY_CATEGORY, EVENT_CATEGORY, RELATION_CATEGORY, UNKNOWN_CATEGORY = range(
     4)
@@ -613,7 +613,6 @@ def __read_first_in_directory_tree(directory, filename):
     from os.path import split, join
 
     source, result = None, None
-
     # check from the given directory and parents, but not above BASE_DIR
     if directory is not None:
         # TODO: this check may fail; consider "foo//bar/data"

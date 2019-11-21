@@ -19,8 +19,8 @@ from urllib.parse import unquote
 
 # brat imports
 sys.path.append(os.path.join(os.path.dirname(__file__), 'server/src'))
-from server import serve
-
+# from server import serve
+from server.src.server import serve
 
 _VERBOSE_HANDLER = False
 _DEFAULT_SERVER_ADDR = ''

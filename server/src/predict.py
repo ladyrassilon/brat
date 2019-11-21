@@ -17,11 +17,11 @@ from urllib.error import URLError
 from urllib.parse import quote_plus
 from urllib.request import urlopen
 
-from annlog import log_annotation
-from common import ProtocolError
-from document import real_directory
-from jsonwrap import loads
-from projectconfig import ProjectConfiguration
+from .annlog import log_annotation
+from .common import ProtocolError
+from .document import real_directory
+from .jsonwrap import loads
+from .projectconfig import ProjectConfiguration
 
 # TODO: Reduce the SimSem coupling
 

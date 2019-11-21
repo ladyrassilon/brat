@@ -6,6 +6,6 @@
 _something_ to the user even if Messager itself breaks."""
 
 try:
-    from realmessage import Messager
+    from .realmessage import Messager
 except BaseException:
-    from sosmessage import SosMessager as Messager
+    from .sosmessage import SosMessager as Messager

@@ -13,7 +13,7 @@ NOTE(S):
 Author:     Pontus Stenetorp   <pontus is s u-tokyo ac jp>
 Version:    2011-09-29
 """
-
+from cgi import FieldStorage
 from os.path import join as path_join
 from os.path import abspath
 from sys import stderr, version_info
@@ -48,8 +48,8 @@ class ConfigurationError(Exception):
 def _permission_check():
     from os import access, R_OK, W_OK
     from config import DATA_DIR, WORK_DIR
-    from jsonwrap import dumps
-    from message import Messager
+    from .jsonwrap import dumps
+    from .message import Messager
 
     if not access(WORK_DIR, R_OK | W_OK):
         Messager.error((('Work dir: "%s" is not read-able and ' % WORK_DIR) +
@@ -83,7 +83,7 @@ def _miss_config_msg():
 
 
 def _config_check():
-    from message import Messager
+    from .message import Messager
 
     from sys import path
     from copy import deepcopy
@@ -171,11 +171,11 @@ def _safe_serve(params, client_ip, client_hostname, cookie_data):
 
     # Do the necessary imports after enabling the logging, order critical
     try:
-        from common import ProtocolError, ProtocolArgumentError, NoPrintJSONError
-        from dispatch import dispatch
-        from jsonwrap import dumps
-        from message import Messager
-        from session import get_session, init_session, close_session, NoSessionError, SessionStoreError
+        from .common import ProtocolError, ProtocolArgumentError, NoPrintJSONError
+        from .dispatch import dispatch
+        from .jsonwrap import dumps
+        from .message import Messager
+        from .session import get_session, init_session, close_session, NoSessionError, SessionStoreError
     except ImportError:
         # Note: Heisenbug trap for #612, remove after resolved
         from logging import critical as log_critical
@@ -193,13 +193,17 @@ def _safe_serve(params, client_ip, client_hostname, cookie_data):
             # Also take the opportunity to convert Strings into Unicode,
             #   according to HTTP they should be UTF-8
             try:
-                http_args[k] = params.getvalue(k)
+                # import ipdb; ipdb.set_trace()
+                if type(params) == FieldStorage:
+                    http_args[k] = params.getvalue(k)
+                else:
+                    http_args[k] = params.get(k)
             except TypeError as e:
                 # Messager.error(e)
                 Messager.error(
                     'protocol argument error: expected string argument %s, got %s' %
                     (k, type(
-                        params.getvalue(k))))
+                        params.get(k))))
                 raise ProtocolArgumentError
 
         # Dispatch the request
@@ -255,8 +259,8 @@ def _get_stack_trace():
 
 def _server_crash(cookie_hdrs, e):
     from config import ADMIN_CONTACT_EMAIL, DEBUG
-    from jsonwrap import dumps
-    from message import Messager
+    from .jsonwrap import dumps
+    from .message import Messager
 
     stack_trace = _get_stack_trace()
 
@@ -306,8 +310,8 @@ def serve(params, client_ip, client_hostname, cookie_data):
                 ''' % (PY_VER_STR, REQUIRED_PY_VERSION_STR)).strip())
 
     # We can now safely use json and Messager
-    from jsonwrap import dumps
-    from message import Messager
+    from .jsonwrap import dumps
+    from .message import Messager
 
     try:
         # We need to lock here since flup uses threads for each request and

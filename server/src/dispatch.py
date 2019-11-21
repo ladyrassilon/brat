@@ -15,29 +15,31 @@ from os.path import abspath, normpath
 
 from config import DATA_DIR
 
-from annlog import log_annotation
-from annotator import (create_arc, create_span, create_span_batch, delete_arc, delete_span,
+from .annlog import log_annotation
+from .annotator import (create_arc, create_span, create_span_batch, delete_arc, delete_span,
                        reverse_arc, split_span)
-from auth import NotAuthorisedError, login, logout, whoami
-from common import ProtocolError
-from convert.convert import convert
-from delete import delete_collection, delete_document
-from docimport import save_import
-from document import (get_configuration, get_directory_information,
+from .auth import NotAuthorisedError, login, logout, whoami
+from .common import ProtocolError
+from .convert.convert import convert
+from .delete import delete_collection, delete_document
+from .docimport import save_import
+from .document import (get_configuration, get_directory_information,
                       get_document, get_document_timestamp)
-from download import download_collection, download_file
-from jsonwrap import dumps
-from message import Messager
-from norm import norm_get_data, norm_get_name, norm_search
-from predict import suggest_span_types
-from search import (search_entity, search_event, search_note, search_relation,
+from .download import download_collection, download_file
+from .jsonwrap import dumps
+from .message import Messager
+from .norm import norm_get_data, norm_get_name, norm_search
+from .predict import suggest_span_types
+from .search import (search_entity, search_event, search_note, search_relation,
                     search_text)
-from session import get_session, load_conf, save_conf
-from svg import retrieve_stored, store_svg
-from tag import tag
-from undo import undo
-from auditing import AuditLog
+from .session import load_conf, save_conf
+from .svg import retrieve_stored, store_svg
+from .tag import tag
+from .undo import undo
+from .auditing import AuditLog
 import multiprocessing as mp
+
+from flask import session
 
 # no-op function that can be invoked by client to log a user action
 
@@ -270,7 +272,8 @@ def dispatch(http_args, client_ip, client_hostname):
     # Make sure that we are authenticated if we are to do certain actions
     if action in REQUIRES_AUTHENTICATION:
         try:
-            user = get_session()['user']
+            user = session['user']
+            # user = get_session()['user']
             http_args['user'] = user
         except KeyError:
             user = None

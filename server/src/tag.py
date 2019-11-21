@@ -15,14 +15,14 @@ from os.path import join as path_join
 from socket import error as SocketError
 from urllib.parse import urlparse
 
-from annotation import (NormalizationAnnotation, TextAnnotations,
+from .annotation import (NormalizationAnnotation, TextAnnotations,
                         TextBoundAnnotationWithText)
-from annotator import ModificationTracker, _json_from_ann
-from common import ProtocolError
-from document import real_directory
-from jsonwrap import loads
-from message import Messager
-from projectconfig import ProjectConfiguration
+from .annotator import ModificationTracker, _json_from_ann
+from .common import ProtocolError
+from .document import real_directory
+from .jsonwrap import loads
+from .message import Messager
+from .projectconfig import ProjectConfiguration
 
 # Constants
 QUERY_TIMEOUT = 30

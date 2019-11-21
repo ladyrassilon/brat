@@ -21,15 +21,15 @@ from os.path import abspath, dirname, getmtime, isabs, isdir, normpath
 
 from config import BASE_DIR, DATA_DIR
 
-from annlog import annotation_logging_active
-from annotation import (BIONLP_ST_2013_COMPATIBILITY, JOINED_ANN_FILE_SUFF,
+from .annlog import annotation_logging_active
+from .annotation import (BIONLP_ST_2013_COMPATIBILITY, JOINED_ANN_FILE_SUFF,
                         TEXT_FILE_SUFFIX, AnnotationCollectionNotFoundError,
                         AnnotationFileNotFoundError, TextAnnotations,
                         open_textfile)
-from auth import AccessDeniedError, allowed_to_read
-from common import CollectionNotAccessibleError, ProtocolError
-from message import Messager
-from projectconfig import (ARC_DRAWING_ATTRIBUTES, ATTR_DRAWING_ATTRIBUTES,
+from .auth import AccessDeniedError, allowed_to_read
+from .common import CollectionNotAccessibleError, ProtocolError
+from .message import Messager
+from .projectconfig import (ARC_DRAWING_ATTRIBUTES, ATTR_DRAWING_ATTRIBUTES,
                            SEPARATOR_STR, SPAN_DRAWING_ATTRIBUTES,
                            SPECIAL_RELATION_TYPES, VISUAL_ARC_DEFAULT,
                            VISUAL_ATTR_DEFAULT, VISUAL_SPAN_DEFAULT,
@@ -39,7 +39,7 @@ from projectconfig import (ARC_DRAWING_ATTRIBUTES, ATTR_DRAWING_ATTRIBUTES,
                            options_get_validation,
                            visual_options_get_arc_bundle,
                            visual_options_get_text_direction)
-from stats import get_statistics
+from .stats import get_statistics
 
 
 def _fill_type_configuration(
@@ -695,32 +695,32 @@ def _enrich_json_with_text(j_dic, txt_file_path, raw_text=None):
 
     # First, generate tokenisation
     if tokeniser == 'mecab':
-        from tokenise import jp_token_boundary_gen
+        from .tokenise import jp_token_boundary_gen
         tok_offset_gen = jp_token_boundary_gen
     elif tokeniser == 'whitespace':
-        from tokenise import whitespace_token_boundary_gen
+        from .tokenise import whitespace_token_boundary_gen
         tok_offset_gen = whitespace_token_boundary_gen
     elif tokeniser == 'ptblike':
-        from tokenise import gtb_token_boundary_gen
+        from .tokenise import gtb_token_boundary_gen
         tok_offset_gen = gtb_token_boundary_gen
     else:
         Messager.warning('Unrecognized tokenisation option '
                          ', reverting to whitespace tokenisation.')
-        from tokenise import whitespace_token_boundary_gen
+        from .tokenise import whitespace_token_boundary_gen
         tok_offset_gen = whitespace_token_boundary_gen
     j_dic['token_offsets'] = [o for o in tok_offset_gen(text)]
 
     ssplitter = options_get_ssplitter(dirname(txt_file_path))
     if ssplitter == 'newline':
-        from ssplit import newline_sentence_boundary_gen
+        from .ssplit import newline_sentence_boundary_gen
         ss_offset_gen = newline_sentence_boundary_gen
     elif ssplitter == 'regex':
-        from ssplit import regex_sentence_boundary_gen
+        from .ssplit import regex_sentence_boundary_gen
         ss_offset_gen = regex_sentence_boundary_gen
     else:
         Messager.warning('Unrecognized sentence splitting option '
                          ', reverting to newline sentence splitting.')
-        from ssplit import newline_sentence_boundary_gen
+        from .ssplit import newline_sentence_boundary_gen
         ss_offset_gen = newline_sentence_boundary_gen
     j_dic['sentence_offsets'] = [o for o in ss_offset_gen(text)]
 
@@ -817,7 +817,7 @@ def _enrich_json_with_data(j_dic, ann_obj):
         import os
         docdir = os.path.dirname(ann_obj._document)
         if options_get_validation(docdir) in ('all', 'full', ):
-            from verify_annotations import verify_annotation
+            from .verify_annotations import verify_annotation
             projectconf = ProjectConfiguration(docdir)
             issues = verify_annotation(ann_obj, projectconf)
         else:
@@ -836,7 +836,7 @@ def _enrich_json_with_data(j_dic, ann_obj):
 
     # Attach the source files for the annotations and text
     from os.path import splitext
-    from annotation import TEXT_FILE_SUFFIX
+    from .annotation import TEXT_FILE_SUFFIX
     ann_files = [splitext(p)[1][1:] for p in ann_obj._input_files]
     ann_files.append(TEXT_FILE_SUFFIX)
     ann_files = sorted([p for p in set(ann_files)])
