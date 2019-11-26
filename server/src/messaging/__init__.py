@@ -1,1 +1,1 @@
-from .sns import Queue
+from .sns import NotificationService

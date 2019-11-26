@@ -15,6 +15,7 @@ from os.path import join as path_join
 from os.path import split as path_split
 from re import compile as re_compile
 
+from server.src.celery import celery
 from .annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
                         AnnotationsIsReadOnlyError, AttributeAnnotation,
                         BinaryRelationAnnotation,
@@ -31,7 +32,8 @@ from .message import Messager
 from .projectconfig import (ENTITY_CATEGORY, EVENT_CATEGORY, RELATION_CATEGORY,
                            UNKNOWN_CATEGORY, ProjectConfiguration)
 
-from .messaging import Queue
+from .messaging import NotificationService
+
 
 try:
     from config import DEBUG
@@ -1326,7 +1328,7 @@ def set_status(directory, document, status=None):
 
 
 def mark_document_done(collection, document, user):
-    json_dic = Queue.send_document_done_notification(
+    json_dic = NotificationService.send_document_done_notification(
         collection=collection,
         document=document,
         user=user,

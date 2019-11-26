@@ -2,14 +2,16 @@ import os
 
 from boto3 import client, resource
 
+from ..celery import celery
 from config import AWS_CREDENTIALS, AWS_SNS_QUEUE
 
-class _Queue:
-    def __init__(self):
-        self._client = client('sqs', **AWS_CREDENTIALS)
-        self._resource = client('sqs', **AWS_CREDENTIALS)
+sns_client = client('sqs', **AWS_CREDENTIALS)
+sns_resource = client('sqs', **AWS_CREDENTIALS)
 
-    def send_document_done_notification(self, collection, document, user):
+class NotificationService:
+
+    @celery.task()
+    def _send_document_done_notification(collection, document, user):
         document_path = os.path.join(collection, document)
         message_attributes = {
             "User": {
@@ -41,10 +43,12 @@ class _Queue:
             "MessageBody": message_body,
         }
 
-        response = self._client.send_message(**message_kwargs)
+        response = sns_client.send_message(**message_kwargs)
+
+    @classmethod
+    def send_document_done_notification(cls, collection, document, user):
+        task = cls._send_document_done_notification.delay(collection, document, user)
         json_dic = {
-            'mesage_id': response["MessageId"],
+            'task_id': task.id,
         }
         return json_dic
-
-Queue = _Queue()
