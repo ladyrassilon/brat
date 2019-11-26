@@ -1,10 +1,8 @@
-import json
-from config import BASE_DIR
-from os.path import join as path_join
+
 from analytics import Client
 import config
-from datetime import datetime
-from uuid import uuid4
+
+from ..celery import celery
 
 class _AuditLog:
     def __init__(self):
@@ -20,25 +18,16 @@ class _AuditLog:
             'document': document,
             'label_type_id': label_type_id,
         }
-        output_file_path = path_join(BASE_DIR, "auditing", f"{user}.txt")
-        with open(output_file_path, "a+") as output_file:
-            output_entry = {
-                "user": user,
-                "event": action,
-                "collection": collection,
-                "document": document,
-                "label_type_id": label_type_id,
-                "timestamp": datetime.now().isoformat(),
-                "uuid": str(uuid4()),
-            }
-            output_file.write("{}\n".format(json.dumps(output_entry)))
-        # self.client.track(user_id=user, event=action, properties=properties)
-        # self.client.flush()
+        self.client.track(user_id=user, event=action, properties=properties)
 
-    def log_event(self, user, action, *args, **kwargs):
+    @celery.task()
+    def _log_event(self, user, action, *args, **kwargs):
         if action in self.event_mapper:
             self.event_mapper[action](user=user, action=action, *args, **kwargs)
         else:
             self._annotation_event(user=user, action=action, *args, **kwargs)
+
+    def log_event(self, user, action, *args, **kwargs):
+        self._log_event.delay(user=user, action=action, *args, **kwargs)
 
 AuditLog = _AuditLog()
