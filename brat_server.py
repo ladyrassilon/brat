@@ -8,6 +8,13 @@ import config as brat_config
 
 app = Flask(__name__)
 
+
+if hasattr(brat_config, "CELERY_BROKER_URL"):
+    app.config.update(
+    CELERY_BROKER_URL=brat_config.CELERY_RESULT_BACKEND,
+    CELERY_RESULT_BACKEND=brat_config.CELERY_BROKER_URL
+    )
+
 try:
     app.secret_key = brat_config.SECRET_KEY
 except AttributeError:
