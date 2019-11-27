@@ -10,8 +10,7 @@ sns_resource = client('sqs', **AWS_CREDENTIALS)
 
 class NotificationService:
 
-    @celery.task()
-    def _send_document_done_notification(collection, document, user):
+    def send_document_done_notification(collection, document, user):
         document_path = os.path.join(collection, document)
         message_attributes = {
             "User": {
@@ -44,11 +43,4 @@ class NotificationService:
         }
 
         response = sns_client.send_message(**message_kwargs)
-
-    @classmethod
-    def send_document_done_notification(cls, collection, document, user):
-        task = cls._send_document_done_notification.delay(collection, document, user)
-        json_dic = {
-            'task_id': task.id,
-        }
-        return json_dic
+        return response
