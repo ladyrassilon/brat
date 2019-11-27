@@ -2,32 +2,29 @@
 from analytics import Client
 import config
 
-from ..celery import celery
 
-class _AuditLog:
-    def __init__(self):
-        self.client = Client(config.SEGMENT_API_KEY, )
-        self.event_mapper = {'login': self._login_event}
+segment_client = Client(config.SEGMENT_API_KEY)
 
-    def _login_event(self, user, *args, **kwargs):
-        self.client.identify(user_id=user)
 
-    def _annotation_event(self, user, action, collection, document, label_type_id, *args, **kwargs):
-        properties = {
-            'collection': collection,
-            'document': document,
-            'label_type_id': label_type_id,
-        }
-        self.client.track(user_id=user, event=action, properties=properties)
+def _annotation_event(user, action, collection, document, label_type_id, *args, **kwargs):
+    properties = {
+        'collection': collection,
+        'document': document,
+        'label_type_id': label_type_id,
+    }
 
-    @celery.task()
-    def _log_event(self, user, action, *args, **kwargs):
-        if action in self.event_mapper:
-            self.event_mapper[action](user=user, action=action, *args, **kwargs)
+    segment_client.track(user_id=user, event=action, properties=properties)
+
+
+def _login_event(user, *args, **kwargs):
+    segment_client.identify(user_id=user)
+
+event_mapper = {'login': _login_event}
+
+
+class AuditLog:
+    def log_event(user, action, *args, **kwargs):
+        if action in event_mapper:
+            event_mapper[action](user=user, action=action, *args, **kwargs)
         else:
-            self._annotation_event(user=user, action=action, *args, **kwargs)
-
-    def log_event(self, user, action, *args, **kwargs):
-        self._log_event.delay(user=user, action=action, *args, **kwargs)
-
-AuditLog = _AuditLog()
+            _annotation_event(user=user, action=action, *args, **kwargs)
