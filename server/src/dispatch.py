@@ -14,6 +14,7 @@ from os.path import join as path_join
 from os.path import abspath, normpath
 
 from config import DATA_DIR
+from server.src.tasks import log_event
 
 from .annlog import log_annotation
 
@@ -356,7 +357,7 @@ def dispatch(http_args, client_ip, client_hostname):
         # ctx = mp.get_context('fork')
         # log_process = ctx.Process(target=AuditLog.log_event, kwargs=log_process_kwargs, daemon=True)
         # log_process.start()
-        AuditLog.log_event(**log_process_kwargs)
+        log_event(**log_process_kwargs)
 
     # Assign which action that was performed to the json_dic
     json_dic['action'] = action

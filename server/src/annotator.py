@@ -16,6 +16,7 @@ from os.path import split as path_split
 from re import compile as re_compile
 
 from server.src.celery import celery
+from server.src.tasks import send_document_done_notification
 from .annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
                         AnnotationsIsReadOnlyError, AttributeAnnotation,
                         BinaryRelationAnnotation,
@@ -1328,11 +1329,7 @@ def set_status(directory, document, status=None):
 
 
 def mark_document_done(collection, document, user):
-    json_dic = NotificationService.send_document_done_notification(
-        collection=collection,
-        document=document,
-        user=user,
-    )
+    json_dic = send_document_done_notification(collection, document, user)
     return json_dic
 
 
