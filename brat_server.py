@@ -8,6 +8,13 @@ import config as brat_config
 
 app = Flask(__name__)
 
+
+if hasattr(brat_config, "CELERY_BROKER_URL"):
+    app.config.update(
+    CELERY_BROKER_URL=brat_config.CELERY_RESULT_BACKEND,
+    CELERY_RESULT_BACKEND=brat_config.CELERY_BROKER_URL
+    )
+
 try:
     app.secret_key = brat_config.SECRET_KEY
 except AttributeError:
@@ -34,7 +41,9 @@ def ajax_cgi():
     cookie_hdrs, response_data = serve(params, remote_addr, remote_host,
                                        cookie_data)
 
+
     return jsonify(response_data[1])
+
     # Package and send response
     if cookie_hdrs is not None:
         response_hdrs = [hdr for hdr in cookie_hdrs]

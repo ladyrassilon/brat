@@ -1,44 +1,30 @@
-import json
-from config import BASE_DIR
-from os.path import join as path_join
+
 from analytics import Client
 import config
-from datetime import datetime
-from uuid import uuid4
 
-class _AuditLog:
-    def __init__(self):
-        self.client = Client(config.SEGMENT_API_KEY, )
-        self.event_mapper = {'login': self._login_event}
 
-    def _login_event(self, user, *args, **kwargs):
-        self.client.identify(user_id=user)
+segment_client = Client(config.SEGMENT_API_KEY)
 
-    def _annotation_event(self, user, action, collection, document, label_type_id, *args, **kwargs):
-        properties = {
-            'collection': collection,
-            'document': document,
-            'label_type_id': label_type_id,
-        }
-        output_file_path = path_join(BASE_DIR, "auditing", f"{user}.txt")
-        with open(output_file_path, "a+") as output_file:
-            output_entry = {
-                "user": user,
-                "event": action,
-                "collection": collection,
-                "document": document,
-                "label_type_id": label_type_id,
-                "timestamp": datetime.now().isoformat(),
-                "uuid": str(uuid4()),
-            }
-            output_file.write("{}\n".format(json.dumps(output_entry)))
-        # self.client.track(user_id=user, event=action, properties=properties)
-        # self.client.flush()
 
-    def log_event(self, user, action, *args, **kwargs):
-        if action in self.event_mapper:
-            self.event_mapper[action](user=user, action=action, *args, **kwargs)
+def _annotation_event(user, action, collection, document, label_type_id, *args, **kwargs):
+    properties = {
+        'collection': collection,
+        'document': document,
+        'label_type_id': label_type_id,
+    }
+
+    segment_client.track(user_id=user, event=action, properties=properties)
+
+
+def _login_event(user, *args, **kwargs):
+    segment_client.identify(user_id=user)
+
+event_mapper = {'login': _login_event}
+
+
+class AuditLog:
+    def log_event(user, action, *args, **kwargs):
+        if action in event_mapper:
+            event_mapper[action](user=user, action=action, *args, **kwargs)
         else:
-            self._annotation_event(user=user, action=action, *args, **kwargs)
-
-AuditLog = _AuditLog()
+            _annotation_event(user=user, action=action, *args, **kwargs)

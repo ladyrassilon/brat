@@ -15,6 +15,8 @@ from os.path import join as path_join
 from os.path import split as path_split
 from re import compile as re_compile
 
+from server.src.celery import celery
+from server.src.tasks import send_document_done_notification
 from .annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
                         AnnotationsIsReadOnlyError, AttributeAnnotation,
                         BinaryRelationAnnotation,
@@ -30,6 +32,9 @@ from .jsonwrap import loads as json_loads
 from .message import Messager
 from .projectconfig import (ENTITY_CATEGORY, EVENT_CATEGORY, RELATION_CATEGORY,
                            UNKNOWN_CATEGORY, ProjectConfiguration)
+
+from .messaging import NotificationService
+
 
 try:
     from config import DEBUG
@@ -460,7 +465,6 @@ def create_span_batch(collection, document, offsets, type, attributes=None,
     return _create_span(collection, document, offsets, type, attributes,
                         normalizations, id, comment)
 
-
 def create_span(collection, document, offsets, type, attributes=None,
                 normalizations=None, id=None, comment=None):
     # offsets should be JSON string corresponding to a list of (start,
@@ -641,7 +645,11 @@ def _create_span(collection, document, offsets, _type, attributes=None,
 
     if _offset_overlaps(offsets):
         raise SpanOffsetOverlapError(offsets)
+    document_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.txt")
+    with open(document_path) as document_file:
+        document_data = document_file.read()
 
+    import ipdb; ipdb.set_trace()
     directory = collection
     undo_resp = {}
 
@@ -1317,6 +1325,11 @@ def set_status(directory, document, status=None):
     json_dic = {
         'status': new_status
     }
+    return json_dic
+
+
+def mark_document_done(collection, document, user):
+    json_dic = send_document_done_notification(collection, document, user)
     return json_dic
 
 

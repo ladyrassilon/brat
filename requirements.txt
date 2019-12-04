@@ -7,3 +7,5 @@ ipython[notebook] >=7.8.0,<8.0
 ipdb >=0.12.2,<0.13
 pydevd-pycharm~=192.6817.19
 uWSGI >=2.0.18,<2.1
+celery >=4.3,<4.4
+redis >=3.3.11,<3.4
