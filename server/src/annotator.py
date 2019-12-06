@@ -451,9 +451,26 @@ def create_span_batch(collection, document, offsets, type, attributes=None,
                 normalizations=None, id=None, comment=None):
     offsets = _json_offsets_to_list(offsets)
 
+    annotations_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.ann")
+    with open(annotations_path) as annotations_file:
+        annotations_lines = annotations_file.readlines()
+
+    offset_to_id_map = {}
+    for line in annotations_lines:
+        split_line = line.split()
+        annotation_id = split_line[0]
+        start = int(split_line[2])
+        end = int(split_line[3])
+        offset_to_id_map[(start, end)] = annotation_id
+
     document_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.txt")
+
     with open(document_path, encoding='utf-8') as document_file:
         document_data = document_file.read()
+
+    if (offsets[0][0], offsets[0][1]) in offset_to_id_map:
+        existing_annotation_id = offset_to_id_map[(offsets[0][0], offsets[0][1])]
+        delete_span_batch(collection, document, existing_annotation_id)
 
     initial_span = document_data[offsets[0][0]:offsets[0][1]]
     matches = re.finditer(initial_span, document_data)
