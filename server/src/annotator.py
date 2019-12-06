@@ -646,7 +646,7 @@ def _create_span(collection, document, offsets, _type, attributes=None,
     if _offset_overlaps(offsets):
         raise SpanOffsetOverlapError(offsets)
     document_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.txt")
-    with open(document_path) as document_file:
+    with open(document_path, encoding="utf8") as document_file:
         document_data = document_file.read()
 
     import ipdb; ipdb.set_trace()
