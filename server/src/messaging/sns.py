@@ -1,11 +1,11 @@
+import json
 import os
 
-from boto3 import client, resource
-from config import AWS_CREDENTIALS, AWS_SNS_TOPIC
-
-from ..celery import celery
+from boto3 import client
+from config import AWS_CREDENTIALS, AWS_SNS_TOPIC, DATA_DIR
 
 sns_client = client('sns', **AWS_CREDENTIALS)
+
 
 class NotificationService:
 
@@ -14,31 +14,42 @@ class NotificationService:
         message_attributes = {
             "User": {
                 "DataType": "String",
-                "StringValue" : user,
+                "StringValue": user,
             },
-            "Collection":  {
+            "Collection": {
                 "DataType": "String",
-                "StringValue" : collection,
+                "StringValue": collection,
             },
-            "Document":  {
+            "Document": {
                 "DataType": "String",
-                "StringValue" : document,
+                "StringValue": document,
             },
-            "DocumentPath":  {
+            "DocumentPath": {
                 "DataType": "String",
-                "StringValue" : document_path,
+                "StringValue": document_path,
             },
         }
+
+        full_document_path = "{}.ann".format(os.path.join(DATA_DIR, document_path.lstrip("/")))
+        print(f"Full document path - {full_document_path}")
+        assert (os.path.isfile(full_document_path))
+
+        file_stats = os.stat(full_document_path)
+        assert (file_stats.st_size < 204800)
+
+        with open(full_document_path, encoding='utf-8') as document_file:
+            document_contents = document_file.read()
+
+        message_dict = {"Properties": message_attributes, "File": document_contents}
+
+        message_body = json.dumps(message_dict)
+
         subject = f"{user} finished {document_path}"
-        message = f"""
-        User: {user}
-        File: {document_path}
-        """
         message_kwargs = {
             "Subject": subject,
             "TopicArn": AWS_SNS_TOPIC,
             "MessageAttributes": message_attributes,
-            "Message": message,
+            "Message": message_body,
         }
         response = sns_client.publish(
             **message_kwargs
