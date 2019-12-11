@@ -1,12 +1,11 @@
 import os
 
 from boto3 import client, resource
+from config import AWS_CREDENTIALS, AWS_SNS_TOPIC
 
 from ..celery import celery
-from config import AWS_CREDENTIALS, AWS_SNS_QUEUE
 
-sns_client = client('sqs', **AWS_CREDENTIALS)
-sns_resource = client('sqs', **AWS_CREDENTIALS)
+sns_client = client('sns', **AWS_CREDENTIALS)
 
 class NotificationService:
 
@@ -30,17 +29,19 @@ class NotificationService:
                 "StringValue" : document_path,
             },
         }
-
-        message_body = f"""
+        subject = f"{user} finished {document_path}"
+        message = f"""
         User: {user}
         File: {document_path}
         """
         message_kwargs = {
-            "QueueUrl": AWS_SNS_QUEUE,
-            "DelaySeconds": 0,
+            "Subject": subject,
+            "TopicArn": AWS_SNS_TOPIC,
             "MessageAttributes": message_attributes,
-            "MessageBody": message_body,
+            "Message": message,
         }
+        response = sns_client.publish(
+            **message_kwargs
+        )
 
-        response = sns_client.send_message(**message_kwargs)
         return response
