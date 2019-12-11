@@ -1,9 +1,8 @@
 
-from analytics import Client
 import config
+from analytics import Client
 
-
-segment_client = Client(config.SEGMENT_API_KEY)
+segment_client = Client(config.SEGMENT_API_KEY, sync_mode=True)
 
 
 def _annotation_event(user, action, collection, document, label_type_id, *args, **kwargs):
