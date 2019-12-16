@@ -2,7 +2,8 @@ import json
 import os
 
 from boto3 import client
-from config import AWS_CREDENTIALS, AWS_SNS_TOPIC, DATA_DIR
+from config import (AWS_CREDENTIALS, AWS_SNS_TOPIC, DATA_DIR,
+                    SNS_SOURCE_HOSTNAME)
 
 sns_client = client('sns', **AWS_CREDENTIALS)
 
@@ -12,6 +13,10 @@ class NotificationService:
     def send_document_done_notification(collection, document, user):
         document_path = os.path.join(collection, document)
         message_attributes = {
+            "Hostname": {
+                "DataType": "String",
+                "StringValue": SNS_SOURCE_HOSTNAME
+            },
             "User": {
                 "DataType": "String",
                 "StringValue": user,
