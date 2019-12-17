@@ -16,7 +16,7 @@ from os.path import split as path_split
 from re import compile as re_compile
 
 from server.src.celery import celery
-from server.src.tasks import send_document_done_notification
+from server.src.tasks.offline_tasks import send_document_done_notification
 from .annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
                         AnnotationsIsReadOnlyError, AttributeAnnotation,
                         BinaryRelationAnnotation,
