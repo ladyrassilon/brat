@@ -14,7 +14,7 @@ from os.path import join as path_join
 from os.path import abspath, normpath
 
 from config import DATA_DIR
-from server.src.tasks.offline_tasks import log_event
+from server.src.tasks.communication import log_event
 
 from .annlog import log_annotation
 

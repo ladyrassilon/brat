@@ -16,7 +16,7 @@ from os.path import split as path_split
 from re import compile as re_compile
 
 from server.src.celery import celery
-from server.src.tasks.offline_tasks import send_document_done_notification
+from server.src.tasks import send_document_done_notification, git_commit_task
 from .annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
                         AnnotationsIsReadOnlyError, AttributeAnnotation,
                         BinaryRelationAnnotation,
@@ -1345,6 +1345,7 @@ def set_status(directory, document, status=None):
 
 
 def mark_document_done(collection, document, user):
+    git_commit_task(collection, document, user)
     json_dic = send_document_done_notification(collection, document, user)
     return json_dic
 
