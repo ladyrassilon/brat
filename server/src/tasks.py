@@ -2,7 +2,7 @@ import os
 
 from server.src.auditing import AuditLog
 from server.src.celery import celery
-from server.src.data.git import push_to_origin, commit_file
+from server.src.datamanagement.git import push_to_origin, commit_file
 from server.src.messaging import NotificationService
 
 @celery.task(queue="communication")
