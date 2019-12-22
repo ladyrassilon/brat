@@ -3,6 +3,7 @@ import json
 from git import Repo
 import config
 
+import ipdb; ipdb.set_trace()
 repo = Repo(config.DATA_DIR)
 
 if hasattr(config, 'GIT_BRANCH'):
