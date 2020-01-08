@@ -13,3 +13,5 @@ auditing/
 logfiles/
 .DS_Store
 .ipynb_checkpoints/
+celerybeat-schedule.db
+celerybeat.pid
