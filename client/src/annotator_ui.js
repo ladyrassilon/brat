@@ -795,13 +795,15 @@ var AnnotatorUI = (function($, window, undefined) {
         }
         $('#span_highlight_link').attr('href', linkHash);
         if (span && !reselectedSpan) {
-          $('#span_form_reselect, #span_form_delete, #span_form_add_fragment').show();
+          $('#span_form_reselect, #span_form_delete, #span_form_delete_batch, #span_form_add_fragment').show();
+          $('#span_form_batch_annotate').hide();
           keymap[$.ui.keyCode.DELETE] = 'span_form_delete';
           keymap[$.ui.keyCode.INSERT] = 'span_form_reselect';
           keymap['S-' + $.ui.keyCode.ENTER] = 'span_form_add_fragment';
           $('#span_notes').val(span.annotatorNotes || '');
         } else {
-          $('#span_form_reselect, #span_form_delete, #span_form_add_fragment').hide();
+          $('#span_form_reselect, #span_form_delete, #span_form_delete_batch, #span_form_add_fragment').hide();
+          $('#span_form_batch_annotate').show();
           keymap[$.ui.keyCode.DELETE] = null;
           keymap[$.ui.keyCode.INSERT] = null;
           keymap['S-' + $.ui.keyCode.ENTER] = null;
@@ -2439,6 +2441,21 @@ var AnnotatorUI = (function($, window, undefined) {
         $('#waiter').dialog('open');
       };
 
+      var deleteSpanBatch = function() {
+        if (Configuration.confirmModeOn && !confirm("Are you sure you want to delete these annotations?")) {
+          return;
+        }
+        $.extend(spanOptions, {
+          action: 'deleteSpanBatch',
+          collection: coll,
+          'document': doc,
+        });
+        spanOptions.offsets = JSON.stringify(spanOptions.offsets);
+        dispatcher.post('ajax', [spanOptions, 'edited']);
+        dispatcher.post('hideForm');
+        $('#waiter').dialog('open');
+      };
+
       var reselectSpan = function() {
         dispatcher.post('hideForm');
         svgElement.addClass('reselect');
@@ -2570,6 +2587,10 @@ var AnnotatorUI = (function($, window, undefined) {
               text: "Delete",
               click: deleteSpan
             }, {
+              id: 'span_form_delete_batch',
+              text: "Delete Batch",
+              click: deleteSpanBatch
+            },{
               id: 'span_form_delete_fragment',
               text: "Delete Frag.",
               click: deleteFragment
@@ -2622,6 +2643,7 @@ var AnnotatorUI = (function($, window, undefined) {
       // set button tooltips (@amadanmath: can this be done in init?)
       $('#span_form_reselect').attr('title', 'Re-select the text span that this annotation marks.');
       $('#span_form_delete').attr('title', 'Delete this annotation.');
+      $('#span_form_delete_batch').attr('title', 'Delete all matching annotations');
       $('#span_form_split').attr('title', 'Split this annotation into multiple similar annotations, distributing its arguments.');
 
       var setTypeLock = function(val) {

@@ -9,10 +9,10 @@ Version:    2011-11-30
 
 
 
-from annotation import TextAnnotations
-from annotator import create_span, delete_span
-from common import ProtocolError
-from jsonwrap import loads as json_loads
+from .annotation import TextAnnotations
+from .annotator import create_span, delete_span
+from .common import ProtocolError
+from .jsonwrap import loads as json_loads
 
 
 class CorruptUndoTokenError(ProtocolError):

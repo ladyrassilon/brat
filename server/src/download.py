@@ -13,9 +13,9 @@ from os.path import basename, dirname, normpath
 from subprocess import Popen
 from tempfile import mkstemp
 
-from annotation import open_textfile
-from common import NoPrintJSONError
-from document import real_directory
+from .annotation import open_textfile
+from .common import NoPrintJSONError
+from .document import real_directory
 
 try:
     pass

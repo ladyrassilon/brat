@@ -14,30 +14,35 @@ from os.path import join as path_join
 from os.path import abspath, normpath
 
 from config import DATA_DIR
+from server.src.tasks import log_event
 
-from annlog import log_annotation
-from annotator import (create_arc, create_span, create_span_batch, delete_arc, delete_span,
-                       reverse_arc, split_span)
-from auth import NotAuthorisedError, login, logout, whoami
-from common import ProtocolError
-from convert.convert import convert
-from delete import delete_collection, delete_document
-from docimport import save_import
-from document import (get_configuration, get_directory_information,
-                      get_document, get_document_timestamp)
-from download import download_collection, download_file
-from jsonwrap import dumps
-from message import Messager
-from norm import norm_get_data, norm_get_name, norm_search
-from predict import suggest_span_types
-from search import (search_entity, search_event, search_note, search_relation,
+from .annlog import log_annotation
+
+from .annotator import (create_arc, create_span, create_span_batch, delete_arc, delete_span, mark_document_done,
+                        delete_span_batch, reverse_arc, split_span)
+
+from .auth import NotAuthorisedError, login, logout, whoami
+from .common import ProtocolError
+from .convert.convert import convert
+from .delete import delete_collection, delete_document
+from .docimport import save_import
+from .document import (get_configuration, get_directory_information, get_document, get_document_timestamp)
+from .download import download_collection, download_file
+from .jsonwrap import dumps
+from .message import Messager
+from .norm import norm_get_data, norm_get_name, norm_search
+from .predict import suggest_span_types
+from .search import (search_entity, search_event, search_note, search_relation,
                     search_text)
-from session import get_session, load_conf, save_conf
-from svg import retrieve_stored, store_svg
-from tag import tag
-from undo import undo
-from auditing import AuditLog
+from .session import get_session, load_conf, save_conf
+
+from .svg import retrieve_stored, store_svg
+from .tag import tag
+from .undo import undo
+from .auditing import AuditLog
 import multiprocessing as mp
+
+from flask import session
 
 # no-op function that can be invoked by client to log a user action
 
@@ -54,6 +59,7 @@ DISPATCHER = {
     'getDocument': get_document,
     'getDocumentTimestamp': get_document_timestamp,
     'importDocument': save_import,
+    'markDocumentDone': mark_document_done,
 
     'storeSVG': store_svg,
     'retrieveStored': retrieve_stored,
@@ -67,6 +73,7 @@ DISPATCHER = {
     'createSpan': create_span,
     'createSpanBatch': create_span_batch,
     'deleteSpan': delete_span,
+    'deleteSpanBatch': delete_span_batch,
     'splitSpan': split_span,
 
     'createArc': create_arc,
@@ -118,6 +125,7 @@ ANNOTATION_ACTION = set((
     'splitSpan',
     'suggestSpanTypes',
     'undo',
+    'markDocumentDone',
 ))
 
 # Actions that will be logged as annotator actions (if so configured)
@@ -270,7 +278,8 @@ def dispatch(http_args, client_ip, client_hostname):
     # Make sure that we are authenticated if we are to do certain actions
     if action in REQUIRES_AUTHENTICATION:
         try:
-            user = get_session()['user']
+            user = session['user']
+            # user = get_session()['user']
             http_args['user'] = user
         except KeyError:
             user = None
@@ -302,6 +311,7 @@ def dispatch(http_args, client_ip, client_hostname):
         default_val_by_arg[arg] = default_val
 
     action_args = []
+
     for arg_name in args:
         arg_val = http_args[arg_name]
 
@@ -347,7 +357,7 @@ def dispatch(http_args, client_ip, client_hostname):
         # ctx = mp.get_context('fork')
         # log_process = ctx.Process(target=AuditLog.log_event, kwargs=log_process_kwargs, daemon=True)
         # log_process.start()
-        AuditLog.log_event(**log_process_kwargs)
+        log_event(**log_process_kwargs)
 
     # Assign which action that was performed to the json_dic
     json_dic['action'] = action

@@ -10,11 +10,14 @@ Version:    2011-04-22
 
 # XXX: This module is messy, re-factor to be done
 import re
+from collections import defaultdict
 from os.path import join as path_join
 from os.path import split as path_split
 from re import compile as re_compile
 
-from annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
+from server.src.celery import celery
+from server.src.tasks import send_document_done_notification
+from .annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
                         AnnotationsIsReadOnlyError, AttributeAnnotation,
                         BinaryRelationAnnotation,
                         DependingAnnotationDeleteError, EquivAnnotation,
@@ -22,13 +25,16 @@ from annotation import (DISCONT_SEP, TEXT_FILE_SUFFIX,
                         OnelineCommentAnnotation, SpanOffsetOverlapError,
                         TextAnnotations, TextBoundAnnotation,
                         TextBoundAnnotationWithText, open_textfile)
-from common import ProtocolArgumentError, ProtocolError
-from document import real_directory
-from jsonwrap import dumps as json_dumps
-from jsonwrap import loads as json_loads
-from message import Messager
-from projectconfig import (ENTITY_CATEGORY, EVENT_CATEGORY, RELATION_CATEGORY,
+from .common import ProtocolArgumentError, ProtocolError
+from .document import real_directory
+from .jsonwrap import dumps as json_dumps
+from .jsonwrap import loads as json_loads
+from .message import Messager
+from .projectconfig import (ENTITY_CATEGORY, EVENT_CATEGORY, RELATION_CATEGORY,
                            UNKNOWN_CATEGORY, ProjectConfiguration)
+
+from .messaging import NotificationService
+
 
 try:
     from config import DEBUG
@@ -150,7 +156,7 @@ def _json_from_ann(ann_obj):
     # request.
     j_dic = {}
     txt_file_path = ann_obj.get_document() + '.' + TEXT_FILE_SUFFIX
-    from document import (_enrich_json_with_data, _enrich_json_with_base,
+    from .document import (_enrich_json_with_data, _enrich_json_with_base,
                           _enrich_json_with_text)
     _enrich_json_with_base(j_dic)
     # avoid reading text file if the given ann_obj already holds it
@@ -445,9 +451,26 @@ def create_span_batch(collection, document, offsets, type, attributes=None,
                 normalizations=None, id=None, comment=None):
     offsets = _json_offsets_to_list(offsets)
 
+    annotations_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.ann")
+    with open(annotations_path) as annotations_file:
+        annotations_lines = annotations_file.readlines()
+
+    offset_to_id_map = {}
+    for line in annotations_lines:
+        split_line = line.split()
+        annotation_id = split_line[0]
+        start = int(split_line[2])
+        end = int(split_line[3])
+        offset_to_id_map[(start, end)] = annotation_id
+
     document_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.txt")
-    with open(document_path) as document_file:
+
+    with open(document_path, encoding='utf-8') as document_file:
         document_data = document_file.read()
+
+    if (offsets[0][0], offsets[0][1]) in offset_to_id_map:
+        existing_annotation_id = offset_to_id_map[(offsets[0][0], offsets[0][1])]
+        delete_span_batch(collection, document, existing_annotation_id)
 
     initial_span = document_data[offsets[0][0]:offsets[0][1]]
     matches = re.finditer(initial_span, document_data)
@@ -458,7 +481,6 @@ def create_span_batch(collection, document, offsets, type, attributes=None,
 
     return _create_span(collection, document, offsets, type, attributes,
                         normalizations, id, comment)
-
 
 def create_span(collection, document, offsets, type, attributes=None,
                 normalizations=None, id=None, comment=None):
@@ -640,6 +662,9 @@ def _create_span(collection, document, offsets, _type, attributes=None,
 
     if _offset_overlaps(offsets):
         raise SpanOffsetOverlapError(offsets)
+    document_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.txt")
+    with open(document_path, encoding="utf8") as document_file:
+        document_data = document_file.read()
 
     directory = collection
     undo_resp = {}
@@ -1077,7 +1102,42 @@ def delete_arc(collection, document, origin, target, type):
 # TODO: ONLY determine what action to take! Delegate to Annotations!
 
 
+def delete_span_batch(collection, document, id):
+    annotations_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.ann")
+    with open(annotations_path) as annotations_file:
+        annotations_lines = annotations_file.readlines()
+
+    # annotations_id_map = {}
+    document_path = path_join(DATA_DIR, collection.lstrip("/"), f"{document}.txt")
+    with open(document_path, encoding="utf-8") as document_file:
+        document_data = document_file.read()
+
+    id_to_text_and_category = {}
+    text_and_category_to_id = defaultdict(list)
+    for line in annotations_lines:
+        annotation_id, content, _ = line.split("\t")
+        annotation_category, start_raw, end_raw = content.split()
+        start = int(start_raw)
+        end = int(end_raw)
+
+        annotation_text = document_data[start:end]
+        id_to_text_and_category[annotation_id] = {
+            "text": annotation_text,
+            "category": annotation_category,
+        }
+        text_and_category_to_id[(annotation_text, annotation_category)].append(annotation_id)
+
+    source_item = id_to_text_and_category[id]
+    source_text = source_item["text"]
+    source_category = source_item["category"]
+
+    matching_ids = text_and_category_to_id[(source_text, source_category)]
+    for matching_id in matching_ids:
+        mods_json = delete_span(collection, document, matching_id)
+    return mods_json
+
 def delete_span(collection, document, id):
+
     directory = collection
 
     real_dir = real_directory(directory)
@@ -1281,6 +1341,12 @@ def set_status(directory, document, status=None):
     json_dic = {
         'status': new_status
     }
+    return json_dic
+
+
+def mark_document_done(collection, document, user):
+    # git_commit_task(collection, document, user)
+    json_dic = send_document_done_notification(collection, document, user)
     return json_dic
 
 

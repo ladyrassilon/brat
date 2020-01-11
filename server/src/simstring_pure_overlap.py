@@ -1,4 +1,4 @@
-from simstring.measure.base import BaseMeasure
+from .simstring.measure.base import BaseMeasure
 from sys import maxsize
 import math
 

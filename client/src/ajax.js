@@ -34,6 +34,7 @@ var Ajax = (function($, window, undefined) {
             type: 'POST',
             success: function(response) {
               pending--;
+              response = JSON.parse(response);
               // If no exception is set, verify the server results
               if (response.exception == undefined && response.action !== data.action) {
                 console.error('Action ' + data.action +

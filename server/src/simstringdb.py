@@ -6,8 +6,8 @@ import sys
 from os.path import join as path_join
 from os.path import sep as path_sep
 
-from common import ProtocolError
-from message import Messager
+from .common import ProtocolError
+from .message import Messager
 
 try:
     from config import BASE_DIR, WORK_DIR

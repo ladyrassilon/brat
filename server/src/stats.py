@@ -20,9 +20,9 @@ from pickle import UnpicklingError
 
 from config import BASE_DIR, DATA_DIR
 
-from annotation import Annotations, open_textfile
-from message import Messager
-from projectconfig import get_config_path, options_get_validation
+from .annotation import Annotations, open_textfile
+from .message import Messager
+from .projectconfig import get_config_path, options_get_validation
 
 # Constants
 STATS_CACHE_FILE_NAME = '.stats_cache'
@@ -103,7 +103,7 @@ def get_statistics(directory, base_names, use_cache=True):
 
     if generate:
         # Generate the document statistics from scratch
-        from annotation import JOINED_ANN_FILE_SUFF
+        from .annotation import JOINED_ANN_FILE_SUFF
         log_info('generating statistics for "%s"' % directory)
         docstats = []
         for docname in base_names:

@@ -9,8 +9,8 @@
 
 import re
 
-import annotation
-from message import Messager
+from . import annotation
+from .message import Messager
 
 # Constants
 DEFAULT_EMPTY_STRING = "***"

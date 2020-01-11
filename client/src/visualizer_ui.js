@@ -917,6 +917,10 @@ var VisualizerUI = (function($, window, undefined) {
         dispatcher.post('clearSearch');
       });
 
+      $('#document_done_button').click(function(evt) {
+        dispatcher.post('markDocumentDone');
+      });
+
       var currentSelectorPosition = function() {
         var pos;
         $.each(selectorData.items, function(docNo, docRow) {
@@ -1639,6 +1643,18 @@ var VisualizerUI = (function($, window, undefined) {
           showFileBrowser();
         }
       }
+
+      var markDocumentDone = function() {
+        response = dispatcher.post(1, 'ajax', [{
+          action: 'markDocumentDone',
+          collection: coll,
+          document: doc
+        }]);
+        dispatcher.post('messages', [[['Document Notification Sent', 'comment']]]);
+        showFileBrowser();
+      };
+
+
 
       var saveSVGTimer = null;
       var saveSVG = function() {
@@ -2364,7 +2380,8 @@ var VisualizerUI = (function($, window, undefined) {
           on('clearSVG', showNoDocMessage).
           on('screamingHalt', onScreamingHalt).
           on('configurationChanged', configurationChanged).
-          on('configurationUpdated', updateConfigurationUI);
+          on('configurationUpdated', updateConfigurationUI).
+          on('markDocumentDone', markDocumentDone);
     };
 
     return VisualizerUI;
